@@ -1,0 +1,96 @@
+{
+  "name": "Committee Agenda Bot",
+  "nodes": [
+    {
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "generate-agenda",
+        "responseMode": "responseNode"
+      },
+      "position": [240, 300],
+      "notes": "Trigger URL: http://your-n8n-host/webhook/generate-agenda\nPOST body: { \"meeting_date\": \"April 22, 2026\" }"
+    },
+    {
+      "name": "Start Agenda Job",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "method": "POST",
+        "url": "http://agenda-bot:8000/agenda/generate",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            { "name": "meeting_date", "value": "={{ $json.body.meeting_date }}" }
+          ]
+        },
+        "responseFormat": "json"
+      },
+      "position": [480, 300],
+      "notes": "Calls the FastAPI /agenda/generate endpoint. Returns a job_id immediately."
+    },
+    {
+      "name": "Wait 60s",
+      "type": "n8n-nodes-base.wait",
+      "parameters": { "amount": 60, "unit": "seconds" },
+      "position": [720, 300]
+    },
+    {
+      "name": "Poll Status",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "method": "GET",
+        "url": "=http://agenda-bot:8000/agenda/status/{{ $('Start Agenda Job').item.json.job_id }}",
+        "responseFormat": "json"
+      },
+      "position": [960, 300]
+    },
+    {
+      "name": "Check Complete",
+      "type": "n8n-nodes-base.if",
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.status }}",
+              "operation": "equal",
+              "value2": "complete"
+            }
+          ]
+        }
+      },
+      "position": [1200, 300]
+    },
+    {
+      "name": "Respond with URL",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"status\": \"complete\", \"doc_url\": $json.doc_url } }}"
+      },
+      "position": [1440, 200]
+    },
+    {
+      "name": "Respond with Status",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"status\": $json.status, \"message\": \"Still running — check /agenda/status/\" + $('Start Agenda Job').item.json.job_id } }}"
+      },
+      "position": [1440, 400]
+    }
+  ],
+  "connections": {
+    "Webhook": { "main": [[{ "node": "Start Agenda Job", "type": "main", "index": 0 }]] },
+    "Start Agenda Job": { "main": [[{ "node": "Wait 60s", "type": "main", "index": 0 }]] },
+    "Wait 60s": { "main": [[{ "node": "Poll Status", "type": "main", "index": 0 }]] },
+    "Poll Status": { "main": [[{ "node": "Check Complete", "type": "main", "index": 0 }]] },
+    "Check Complete": {
+      "main": [
+        [{ "node": "Respond with URL", "type": "main", "index": 0 }],
+        [{ "node": "Respond with Status", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "_readme": "Import via n8n Settings > Import Workflow. The agenda-bot URL assumes Docker Compose networking. If running the bot outside Docker, replace 'agenda-bot:8000' with 'localhost:8000'."
+}

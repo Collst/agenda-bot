@@ -1,0 +1,91 @@
+---
+version: '3.8'
+services:
+
+  # ── Agenda Bot API ──────────────────────────────────────────────────────────
+  agenda-bot:
+    build: .
+    container_name: agenda-bot
+    ports:
+      - "8000:8000"
+    env_file: .env
+    volumes:
+      # Persist Google OAuth token across container restarts
+      - ./credentials.json:/app/credentials.json:ro
+      - ./token.json:/app/token.json
+    # depends_on:
+    #   - ollama
+    restart: unless-stopped
+
+  # ── Ollama (local LLM server) ───────────────────────────────────────────────
+  # Only used when LLM_BACKEND=ollama in .env.
+  # On Apple Silicon, run Ollama natively instead (better performance via ANE):
+  #   brew install ollama && ollama serve
+  # Then set OLLAMA_BASE_URL=http://host.docker.internal:11434 in .env
+  # and comment out this service.
+  # ollama:
+  #   image: ollama/ollama:latest
+  #   container_name: ollama
+  #   ports:
+  #     - "11434:11434"
+  #   volumes:
+  #     - ollama_models:/root/.ollama
+  #   restart: unless-stopped
+
+  # ── n8n (workflow trigger) ──────────────────────────────────────────────────
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: n8n
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER=admin
+      - N8N_BASIC_AUTH_PASSWORD=${N8N_BASIC_AUTH_PASSWORD}
+      - WEBHOOK_URL=http://localhost:5678
+    volumes:
+      - n8n_data:/home/node/.n8n
+    restart: unless-stopped
+
+  langfuse:
+    image: langfuse/langfuse:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:${POSTGRES_PASSWORD}@langfuse-db:5432/langfuse
+      - NEXTAUTH_URL=http://localhost:3000
+      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
+      - SALT=${SALT}
+    depends_on:
+      langfuse-db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  langfuse-db:
+    image: postgres:15
+    environment:
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=langfuse
+    volumes:
+      - langfuse_db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  # ollama_models:
+  n8n_data:
+  langfuse_db:
+
+# ── Apple Silicon note ────────────────────────────────────────────────────────
+# For best Ollama performance on M-series Macs, run Ollama outside Docker:
+#   1. brew install ollama
+#   2. ollama serve          (in one terminal)
+#   3. ollama pull qwen2.5:14b
+#   4. In .env: OLLAMA_BASE_URL=http://host.docker.internal:11434
+#   5. Comment out the `ollama` service above.
+#   6. Comment out the depends on ollama instruction in the agenda-bot service.
+# Docker Desktop on Mac does not expose the Apple Neural Engine to containers.

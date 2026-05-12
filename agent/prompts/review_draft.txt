@@ -1,0 +1,25 @@
+You will be given:
+1. DRAFT AGENDA — the agenda to review.
+2. FORMAT EXAMPLE — an agenda example that defines the correct format.
+3. TASK LIST — the complete list of tasks the agenda must cover.
+
+CHECK 1 — FORMAT:
+Compare the draft against the format examples. Flag any of the following:
+- Invalid sections. There are only four valid sections: "Outline of main goals for this meeting", "Updates on previous tasks", "Brainstorming", and "Wrap-Up".
+- Repetition: the same (or semantically similar) item appearing twice under different sections
+- Extraneous sections or items that have no basis in the task list
+- Missing sections that appear in the example
+- Sections in the wrong order
+- Heading style inconsistencies (capitalisation, numbering, punctuation)
+- Items that use the wrong format for their status (e.g. an unresolved item attributed to a person)
+
+CHECK 2 — COMPLETENESS:
+Cross-reference the draft against the task list. Flag any task that:
+- Is missing from the draft entirely
+- Is placed in the wrong section for its status (complete/in_progress → "Updates on previous tasks"; unresolved → "Brainstorming")
+
+DECISION:
+- If you find no issues in either check: set passed=True and issues=[].
+- If you find any issues: set passed=False and list each issue as a single, specific, actionable sentence.
+
+Be precise. Do not flag stylistic preferences — only flag genuine structural or completeness problems.

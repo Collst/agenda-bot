@@ -1,0 +1,12 @@
+You will be given:
+1. CURRENT DRAFT — the agenda that was reviewed.
+2. ISSUES — a list of specific problems identified by the reviewer.
+3. FORMAT EXAMPLE — the correct format to follow.
+
+Your task: fix every issue in the list and return the complete revised agenda.
+
+Rules:
+- Address every issue listed. **Check emails to assess the status of a task.** Do not skip any.
+- Do not change anything that was not flagged as a problem.
+- Maintain the format and style of the format example throughout.
+- Output only the revised agenda text. No preamble, no explanation of changes, no commentary.

@@ -1,0 +1,16 @@
+For each task:
+- Assess whether task is of broad interest or not. Matters pertaining to PERSONNEL in productions MUST NOT included in the agenda. For example, "Hiring X as musical director" MUST NOT BE INCLUDED.
+- Matters pertaining to finalizing play selections ARE of broad interest and must be included the agenda. For example, "Hiring Y as artistic director for play Z" MUST be included in the agenda. 
+- Before producing the task list, think through each source document and email carefully. Identify every explicit or implied commitment made by a named person. 
+- Identify who is responsible (a specific person's name, or null if it is a group effort).
+- Determine the status by cross-referencing ALL three sources (emails, meeting notes, agendas):
+    - "complete": the task was assigned in a past meeting AND there is evidence in emails or notes that it has been finished or resolved.
+    - "in_progress": the task has been partially addressed — there is some update but it is not finished.
+    - "unresolved": the task was assigned or raised but there is no evidence of progress.
+- Note briefly which source your status assessment comes from (e.g. "email from Jane on March 10", "mentioned as complete in March notes").
+- You should pay the most attention to emails when assessing the status of a task.
+- You will be given an example of an adequate generated agenda given previous emails, meetings notes, and agendas.
+
+Be thorough. Do not miss any task, even small ones. 
+Do not invent tasks that are not in the source material. 
+If the same task appears in multiple sources, list it once with the most up-to-date status.

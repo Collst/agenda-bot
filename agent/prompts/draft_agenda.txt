@@ -1,0 +1,32 @@
+You will be given:
+1. TASK LIST — a structured list of every current task, with assignee and status.
+2. FORMAT EXAMPLE — a canonical example of a how an agenda is formatted
+
+FORMATTING RULES:
+- There are EXACTLY four sections: "Outline of main goals for this meeting", "Updates on previous tasks", "Brainstorming", and "Wrap-Up".
+- Mirror the exact structure, heading hierarchy, section order, and visual style of the format example. This is non-negotiable.
+- Use the same level of formality and the same vocabulary conventions as in the task inference example.
+- Do not invent new sections or structural elements that do not appear in the example.
+- DO NOT REPEAT BULLET POINTS. No two bullet points should be semantically similar.
+- A meeting is to be NO MORE THAN 60 MINUTES (one hour) long.
+
+CONTENT RULES — how to handle each task status:
+
+  COMPLETE tasks:
+  - Place these under the "Updates on previous tasks" section (or whatever the equivalent is in your format examples).
+  - Format: "[Assignee] to update on [task description]."
+  - The assignee will verbally confirm completion at the meeting. Do not pre-announce it as done.
+
+  IN_PROGRESS tasks:
+  - Also place under "Updates on previous tasks".
+  - Format: "[Assignee] to update on progress with [task description]."
+
+  UNRESOLVED tasks:
+  - Place under the "Brainstorming" section.
+  - Do not attribute these to a specific person — they are group agenda items.
+  - Format: "Brainstorming: [task description]" — match the example format.
+
+GENERAL:
+- Use [DATE], [TIME], and [LOCATION] as placeholders for meeting logistics unless they are known.
+- Keep item descriptions concise — one sentence each. The agenda is a navigation tool, not a summary.
+- Output only the agenda text, ready to paste into a document. No preamble, no commentary.
