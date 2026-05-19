@@ -63,7 +63,7 @@ pip install -r requirements.txt
 4. Application type: **Desktop app**. Download the JSON and save as `credentials.json` in the project root.
 5. Go to **OAuth consent screen → Test users** and add your Google account.
 
-On first run a browser tab opens for authorisation. `token.json` is then saved automatically.
+On first run a browser tab opens for authorization. `token.json` is then saved automatically.
 
 > `credentials.json` and `token.json` are in `.gitignore`. Never commit them.
 
@@ -82,9 +82,27 @@ Fill in `.env`. Key values:
 | `OUTPUT_FOLDER_ID` | Open the output Drive folder → copy the ID from the URL (`/folders/<ID>`) |
 | `GMAIL_LABEL` | The Gmail label you apply to committee threads |
 | `COMMITTEE_EMAILS` | Comma-separated member addresses (supplement or fallback to label) |
-| `LLM_BACKEND` | `anthropic` or `ollama` |
+| `LLM_BACKEND` | `anthropic`, `ollama`, or `gemini` |
 
-### 4. Install the Langfuse AI Skill
+### 4. Authenticate with Google
+
+Before starting Docker for the first time (or in a dev/dry run), generate your Google OAuth token:
+
+```bash
+source .venv/bin/activate
+python -c "from auth.google import get_credentials; get_credentials()"
+```
+
+This opens a browser tab asking you to sign in with Google and grant the
+required permissions. After completing the flow, a `token.json` file will
+appear in the project root. This step only needs to be done once — Docker
+mounts the file automatically on subsequent runs.
+
+> **Note:** If `token.json` exists as a directory rather than a file (a
+> Docker volume mount artifact), delete it first with `rm -rf token.json`
+> before running the command above.
+
+### 5. Install the Langfuse AI Skill
 
 This repository already includes runtime Langfuse tracing using the `langfuse` Python SDK, `CallbackHandler`, and `@observe()` instrumentation.
 
@@ -109,7 +127,7 @@ LANGFUSE_SECRET_KEY=sk-lf-...
 LANGFUSE_BASE_URL=http://localhost:3000
 ```
 
-### 5. Ollama (local backend only)
+### 6. Ollama (local backend only)
 
 For best performance on Apple Silicon, run Ollama natively rather than in Docker:
 
@@ -285,4 +303,4 @@ This tool processes internal committee emails and meeting notes. If using `LLM_B
 
 ## Adding note-taking later
 
-The modular design is intended to accommodate a transcription → summarisation pipeline later. The natural extension point is a new LangGraph node (or sub-graph) that accepts an audio file, produces structured meeting notes, and writes them into the Notes Google Doc. That sub-graph can be developed and tested independently, then wired into this pipeline without changing any existing nodes.
+The modular design is intended to accommodate a transcription → summarization pipeline later. The natural extension point is a new LangGraph node (or sub-graph) that accepts an audio file, produces structured meeting notes, and writes them into the Notes Google Doc. That sub-graph can be developed and tested independently, then wired into this pipeline without changing any existing nodes.

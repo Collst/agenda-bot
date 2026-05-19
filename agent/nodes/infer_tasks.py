@@ -13,21 +13,13 @@ from services.llm import get_llm
 from langchain_core.runnables import RunnableConfig
 from langfuse import observe
 
-_TASK = (
-    Path(__file__).parent.parent / "prompts" / "infer_tasks.txt"
-    ).read_text()
-
-_PERSONA = (
-    Path(__file__).parent.parent / "personas" / "chair_artistic_development.md"
-    ).read_text()
-
-_SKILL = (
-    Path(__file__).parent.parent / "skills" / "agenda_format.md"
-    ).read_text()
-
-_EXAMPLES = (
-    Path(__file__).parent.parent / "skills" / "task_inference_example.md"
-    ).read_text()
+def _load_prompts() -> tuple[str, str, str, str]:
+    base = Path(__file__).parent.parent
+    task = (base / "prompts" / "infer_tasks.txt").read_text()
+    persona = (base / "personas" / "chair_artistic_development.md").read_text()
+    skill = (base / "skills" / "agenda_format.md").read_text()
+    examples = (base / "skills" / "task_inference_example_template.md").read_text()
+    return task, persona, skill, examples
 
 
 
@@ -66,6 +58,7 @@ def infer_tasks(state: AgendaState, config: RunnableConfig) -> dict:
     Call the LLM with structured output to produce a typed TaskList.
     Returns {"tasks": [serialised Task dicts]}.
     """
+    _TASK, _PERSONA, _SKILL, _EXAMPLES = _load_prompts()
     llm = get_llm().with_structured_output(TaskList)
 
     user_content = (_EXAMPLES
@@ -79,7 +72,7 @@ def infer_tasks(state: AgendaState, config: RunnableConfig) -> dict:
 
     result: TaskList = llm.invoke(
         [
-            SystemMessage(content=_SKILL+"\n\n---\n\n"+_PERSONA+"\n\n---\n\n"+_TASK), 
+            SystemMessage(content=_SKILL+"\n\n---\n\n"+_PERSONA+"\n\n---\n\n"+_TASK),
             HumanMessage(content=user_content)
         ],
         config=config
